@@ -15,8 +15,7 @@ if (code !== null) {
 }
 
 function handleAuthResponse(response) {
-    var url = new URL(response);
-    alert(url.searchParams.get("access_token"));
+    alert(response.searchParams.get("access_token"));
 }
 
 function exchangeCode(code) {
@@ -32,7 +31,7 @@ function exchangeCode(code) {
     http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     http.onreadystatechange = function () {
         if (http.readyState == 4 && http.status == 200) {
-            handleAuthResponse(http.responseText);
+            handleAuthResponse(http.responseUrl);
         }
     }
     http.send(dictToURI(data));
