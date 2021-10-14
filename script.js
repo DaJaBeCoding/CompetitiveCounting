@@ -14,6 +14,11 @@ if (code !== null) {
     exchangeCode(code);
 }
 
+function handleAuthResponse(response) {
+    var url = new URL(response);
+    alert(url.searchParams.get("access_token"));
+}
+
 function exchangeCode(code) {
     var http = new XMLHttpRequest();
     http.open('POST', "https://discord.com/api/oauth2/token");
@@ -27,7 +32,7 @@ function exchangeCode(code) {
     http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     http.onreadystatechange = function () {
         if (http.readyState == 4 && http.status == 200) {
-            alert(http.responseText);
+            handleAuthResponse(http.responseText);
         }
     }
     http.send(dictToURI(data));
