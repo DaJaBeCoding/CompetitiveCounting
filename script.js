@@ -39,6 +39,7 @@ function getUsername(accessType, accessCode) {
 function exchangeCode(code) {
     var http = new XMLHttpRequest();
     http.open('POST', "https://discord.com/api/oauth2/token");
+    http.responseType = 'text';
     var data = {
         'client_id': CLIENT_ID,
         'client_secret': CLIENT_SECRET,
