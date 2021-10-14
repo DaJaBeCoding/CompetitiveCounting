@@ -8,7 +8,7 @@ var REDIRECT_URI = 'https://dajabecoding.github.io/CompetitiveCounting';
 var url_string = window.location.href;
 var url = new URL(url_string);
 var code = url.searchParams.get("code");
-
+document.getElementById("avatar").hidden = true;
 if (code !== null) {
     console.log(code);
     exchangeCode(code);
@@ -29,7 +29,10 @@ function handleUsernameResponse(response) {
     document.getElementById("nameLbl").innerHTML = resJson["user"]["username"] + "#" + resJson["user"]["discriminator"];
     var user_id = resJson["user"]["id"];
     var user_avatar = resJson["user"]["avatar"];
-    document.getElementById("avatar").src = "https://cdn.discordapp.com/avatars/" + user_id + "/" + user_avatar + ".png";
+    if (user_avatar !== null && user_avatar !== "none") {
+        document.getElementById("avatar").src = "https://cdn.discordapp.com/avatars/" + user_id + "/" + user_avatar + ".png";
+        document.getElementById("avatar").hidden = false;
+    }
 }
 
 function getUsername(accessType, accessCode) {
