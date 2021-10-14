@@ -27,6 +27,9 @@ function handleAuthResponse(response) {
 function handleUsernameResponse(response) {
     var resJson = JSON.parse(response);
     document.getElementById("nameLbl").innerHTML = resJson["user"]["username"] + "#" + resJson["user"]["discriminator"];
+    var user_id = resJson["user"]["id"];
+    var user_avatar = resJson["user"]["avatar"];
+    document.getElementById("avatar").src = "https://cdn.discordapp.com/avatars/" + user_id + "/" + user_avatar + ".png";
 }
 
 function getUsername(accessType, accessCode) {
