@@ -16,7 +16,7 @@ if (code !== null) {
 
 function handleAuthResponse(response) {
     console.log(response);
-    var dict = JSON.parse(resposne);
+    var dict = JSON.parse(response);
     var type = dict["token_type"];
     var token = dict["access_token"];
     console.log(type);
