@@ -15,7 +15,25 @@ if (code !== null) {
 }
 
 function handleAuthResponse(response) {
-    alert(response.searchParams.get("access_token"));
+    console.log(response);
+    getUsername();
+}
+
+function handleUsernameResponse(response) {
+    alert("USERNAME: " + response);
+}
+
+function getUsername(accessType, accessCode) {
+    var http = new XMLHttpRequest();
+    http.open('POST', "https://discord.com/api/oauth2/@me");
+
+    http.setRequestHeader('authorization', accessType + " " + accessToken);
+    http.onreadystatechange = function () {
+        if (http.readyState == 4 && http.status == 200) {
+            handleUsernameResponse(http.responseText);
+        }
+    }
+    http.send(dictToURI(data));
 }
 
 function exchangeCode(code) {
