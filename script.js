@@ -25,7 +25,8 @@ function handleAuthResponse(response) {
 }
 
 function handleUsernameResponse(response) {
-    alert("USERNAME: " + response);
+    var resJson = JSON.parse(response);
+    document.getElementById("nameLbl").innerHTML = resJson["user"]["username"] + "#" + resJson["user"]["discriminator"];
 }
 
 function getUsername(accessType, accessCode) {
