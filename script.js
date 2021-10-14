@@ -10,12 +10,13 @@ var url = new URL(url_string);
 var code = url.searchParams.get("code");
 
 if (code !== null) {
-    console.log(exchangeCode(code));
+    console.log(code);
+    exchangeCode(code);
 }
 
 function exchangeCode(code) {
     var http = new XMLHttpRequest();
-    http.open('POST', API_ENDPOINT + '/oauth2/token', true);
+    http.open('POST', "https://discord.com/api/oauth2/token");
     var data = {
         'client_id': CLIENT_ID,
         'client_secret': CLIENT_SECRET,
@@ -29,5 +30,12 @@ function exchangeCode(code) {
             alert(http.responseText);
         }
     }
-    http.send(new URLSearchParams(data))
+    http.send(dictToURI(data));
+}
+function dictToURI(dict) {
+    var str = [];
+    for (var p in dict) {
+        str.push(encodeURIComponent(p) + "=" + encodeURIComponent(dict[p]));
+    }
+    return str.join("&");
 }
