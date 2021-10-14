@@ -16,7 +16,7 @@ if (code !== null) {
 
 function handleAuthResponse(response) {
     console.log(response);
-    getUsername();
+    getUsername(response["token_type"], response["access_token"]);
 }
 
 function handleUsernameResponse(response) {
