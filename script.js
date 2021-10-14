@@ -14,6 +14,8 @@ if (code !== null) {
 }
 
 function exchangeCode(code) {
+    var http = new XMLHttpsRequest();
+    http.open('POST', '%s/oauth2/token' % API_ENDPOINT, true);
     var data = {
         'client_id': CLIENT_ID,
         'client_secret': CLIENT_SECRET,
@@ -21,7 +23,11 @@ function exchangeCode(code) {
         'code': code,
         'redirect_uri': REDIRECT_URI
     }
-    r = requests.post('%s/oauth2/token' % API_ENDPOINT, data = data, headers = headers)
-    r.raise_for_status()
-    return r.json()
+    http.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    http.onreadystatechange = function () {
+        if (http.readyState == 4 && http.status == 200) {
+            alert(http.responseText);
+        }
+    }
+    http.send(new URLSearchParams(data))
 }
