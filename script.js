@@ -25,15 +25,15 @@ function handleUsernameResponse(response) {
 
 function getUsername(accessType, accessCode) {
     var http = new XMLHttpRequest();
-    http.open('POST', "https://discord.com/api/oauth2/@me");
+    http.open('GET', "https://discord.com/api/oauth2/@me");
 
-    http.setRequestHeader('authorization', accessType + " " + accessToken);
+    http.setRequestHeader('authorization', accessType + " " + accessCode);
     http.onreadystatechange = function () {
         if (http.readyState == 4 && http.status == 200) {
             handleUsernameResponse(http.responseText);
         }
     }
-    http.send(dictToURI(data));
+    http.send();
 }
 
 function exchangeCode(code) {
