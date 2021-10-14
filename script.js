@@ -16,7 +16,12 @@ if (code !== null) {
 
 function handleAuthResponse(response) {
     console.log(response);
-    getUsername(response["token_type"], response["access_token"]);
+    var dict = JSON.parse(resposne);
+    var type = dict["token_type"];
+    var token = dict["access_token"];
+    console.log(type);
+    console.log(token);
+    getUsername(type, token);
 }
 
 function handleUsernameResponse(response) {
@@ -25,7 +30,7 @@ function handleUsernameResponse(response) {
 
 function getUsername(accessType, accessCode) {
     var http = new XMLHttpRequest();
-    http.open('GET', "https://discord.com/api/oauth2/@me");
+    http.open('POST', "https://discord.com/api/oauth2/@me");
 
     http.setRequestHeader('authorization', accessType + " " + accessCode);
     http.onreadystatechange = function () {
