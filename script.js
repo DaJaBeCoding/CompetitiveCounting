@@ -15,7 +15,7 @@ if (code !== null) {
 
 function exchangeCode(code) {
     var http = new XMLHttpRequest();
-    http.open('POST', '%s/oauth2/token' % API_ENDPOINT, true);
+    http.open('POST', API_ENDPOINT + '/oauth2/token', true);
     var data = {
         'client_id': CLIENT_ID,
         'client_secret': CLIENT_SECRET,
