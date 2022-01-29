@@ -1,0 +1,2 @@
+#!/bin/sh
+sudo jdk11.0.13_8/bin/java -jar CompetitiveCounting.jar server config.yml

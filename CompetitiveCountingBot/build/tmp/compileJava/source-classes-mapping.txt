@@ -1,0 +1,42 @@
+CompetitiveCounting/Rules/Rule.java
+ CompetitiveCounting.Rules.Rule
+CompetitiveCounting/Counter.java
+ CompetitiveCounting.Counter
+ CompetitiveCounting.Counter$1
+CompetitiveCounting/TimeHandler.java
+ CompetitiveCounting.TimeHandler
+CompetitiveCounting/BaseSystems.java
+ CompetitiveCounting.BaseSystems
+CompetitiveCounting/Main.java
+ CompetitiveCounting.Main
+CompetitiveCounting/CountingStreak.java
+ CompetitiveCounting.CountingStreak
+CompetitiveCounting/Rules/NumberRule.java
+ CompetitiveCounting.Rules.NumberRule
+ CompetitiveCounting.Rules.NumberRule$DividerRule
+CompetitiveCounting/MessageHandler.java
+ CompetitiveCounting.MessageHandler
+CompetitiveCounting/BonusStreak.java
+ CompetitiveCounting.BonusStreak
+ CompetitiveCounting.BonusStreak$1
+ CompetitiveCounting.BonusStreak$BonusCountType
+CompetitiveCounting/Util.java
+ CompetitiveCounting.Util
+CompetitiveCounting/Rules/DigSumRule.java
+ CompetitiveCounting.Rules.DigSumRule
+CompetitiveCounting/Storage.java
+ CompetitiveCounting.Storage
+ CompetitiveCounting.Storage$1
+CompetitiveCounting/Rules/TimeLimitRule.java
+ CompetitiveCounting.Rules.TimeLimitRule
+ CompetitiveCounting.Rules.TimeLimitRule$AnimationThread
+CompetitiveCounting/Unlockable.java
+ CompetitiveCounting.Unlockable
+CompetitiveCounting/Rules/SlowModeRule.java
+ CompetitiveCounting.Rules.SlowModeRule
+ CompetitiveCounting.Rules.SlowModeRule$1
+CompetitiveCounting/Rules/RootRule.java
+ CompetitiveCounting.Rules.RootRule
+CompetitiveCounting/CountingBot.java
+ CompetitiveCounting.CountingBot
+ CompetitiveCounting.CountingBot$1
