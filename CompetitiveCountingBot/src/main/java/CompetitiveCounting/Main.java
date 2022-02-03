@@ -8,6 +8,9 @@ package CompetitiveCounting;
 
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.domain.Event;
+import discord4j.core.event.domain.interaction.ButtonInteractionEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.User;
@@ -26,7 +29,11 @@ public class Main {
     public static void main(String[] args) {
         GatewayDiscordClient client;
         try {
-        client = DiscordClientBuilder.create(Storage.loadConfig())
+            
+            String sec = Storage.loadConfig();
+            sec = sec.replaceAll("\n", "");
+            System.out.println(sec);
+            client = DiscordClientBuilder.create(sec)
                 .build()
                 .login()
                 .block();
@@ -41,9 +48,12 @@ public class Main {
                             "Logged in as %s#%s", self.getUsername(), self.getDiscriminator()
                     ));
                 });
+        
         bot = new CountingBot();
         MessageHandler messageHandler = new MessageHandler(bot);
         client.getEventDispatcher().on(MessageCreateEvent.class).subscribe(messageHandler);
+        ButtonClickHandler buttonHandler = new ButtonClickHandler(bot);
+        client.getEventDispatcher().on(ButtonInteractionEvent.class).subscribe(buttonHandler);
         // database
         /*
         DatabaseConnection databaseConnection = new DatabaseConnection();

@@ -3,17 +3,24 @@ CompetitiveCounting/Rules/Rule.java
 CompetitiveCounting/Counter.java
  CompetitiveCounting.Counter
  CompetitiveCounting.Counter$1
+CompetitiveCounting/TradeOffer.java
+ CompetitiveCounting.TradeOffer
 CompetitiveCounting/TimeHandler.java
  CompetitiveCounting.TimeHandler
 CompetitiveCounting/BaseSystems.java
  CompetitiveCounting.BaseSystems
 CompetitiveCounting/Main.java
  CompetitiveCounting.Main
+CompetitiveCounting/SyntaxChecker.java
+ CompetitiveCounting.SyntaxChecker
+ CompetitiveCounting.SyntaxChecker$SyntaxState
 CompetitiveCounting/CountingStreak.java
  CompetitiveCounting.CountingStreak
 CompetitiveCounting/Rules/NumberRule.java
  CompetitiveCounting.Rules.NumberRule
  CompetitiveCounting.Rules.NumberRule$DividerRule
+CompetitiveCounting/ButtonClickHandler.java
+ CompetitiveCounting.ButtonClickHandler
 CompetitiveCounting/MessageHandler.java
  CompetitiveCounting.MessageHandler
 CompetitiveCounting/BonusStreak.java
@@ -27,6 +34,9 @@ CompetitiveCounting/Rules/DigSumRule.java
 CompetitiveCounting/Storage.java
  CompetitiveCounting.Storage
  CompetitiveCounting.Storage$1
+CompetitiveCounting/Tradable.java
+ CompetitiveCounting.Tradable
+ CompetitiveCounting.Tradable$MoneyTrade
 CompetitiveCounting/Rules/TimeLimitRule.java
  CompetitiveCounting.Rules.TimeLimitRule
  CompetitiveCounting.Rules.TimeLimitRule$AnimationThread
@@ -40,3 +50,4 @@ CompetitiveCounting/Rules/RootRule.java
 CompetitiveCounting/CountingBot.java
  CompetitiveCounting.CountingBot
  CompetitiveCounting.CountingBot$1
+ CompetitiveCounting.CountingBot$2

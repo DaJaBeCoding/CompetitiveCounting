@@ -15,6 +15,7 @@ import discord4j.core.object.entity.channel.TextChannel;
 import discord4j.core.object.reaction.ReactionEmoji;
 import discord4j.discordjson.json.EmojiData;
 import discord4j.discordjson.json.ReactionData;
+import java.util.Optional;
 import org.reactivestreams.Subscription;
 import reactor.core.publisher.BaseSubscriber;
 
@@ -44,7 +45,11 @@ public class MessageHandler extends BaseSubscriber<MessageCreateEvent>{
     
     private void handleMessage(MessageCreateEvent event) {
         Message message = event.getMessage();
-        User author = message.getAuthor().get();
+        Optional<User> opt = message.getAuthor();
+        if(opt.isEmpty()) {
+            return;
+        }
+        User author = opt.get();
         if(author.isBot()) {
             return;
         }

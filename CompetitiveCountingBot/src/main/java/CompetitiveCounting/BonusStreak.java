@@ -41,7 +41,7 @@ public class BonusStreak {
     }
     
     private void success(Message message, int count) {
-        CountingBot.write(message, "Du erhaelst " + (count*type.multiplier) + " geld als " + type.name() + " Belohnung!");
+        CountingBot.write(message, "Bonus received: You get " + (count*type.multiplier) + " money from your " + type.name() + " streak.");
     }
     
     private void fail(Message message, String arg) {
@@ -69,8 +69,14 @@ public class BonusStreak {
         }
         return -2;
     }
+    
+    public int getCurrCount() {
+        return currentCount;
+    }
+    
 
-    private boolean isTimeLegit() {
+
+    public boolean isTimeLegit() {
         if (this.lastCountTime == -1) {
             return true;
         }

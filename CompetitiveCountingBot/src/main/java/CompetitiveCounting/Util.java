@@ -19,4 +19,17 @@ public class Util {
         }
         return pattern.matcher(in).matches();
     }
+    
+    public static String[] splitAtFirst(String str, String splitter) {
+        String[] splitted = str.split(splitter);
+        if(splitted.length <= 1) {
+            return splitted;
+        } else {
+            String snd = "";
+            for(int i = 1; i < splitted.length; i++) {
+                snd += splitted[i];
+            }
+            return new String[]{splitted[0], snd};
+        }
+    }
 }

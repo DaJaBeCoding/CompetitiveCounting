@@ -4,11 +4,16 @@
  * and open the template in the editor.
  */
 package CompetitiveCounting;
+import discord4j.core.object.component.ActionRow;
+import discord4j.core.object.component.Button;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
+import discord4j.core.spec.MessageCreateSpec;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  *
@@ -22,6 +27,8 @@ public class CountingBot {
     private HashMap<String, CountingStreak> streaks;
 
     private static CountingBot instance;
+    
+    private static int currId = 0;
 
     public CountingBot() {
         storage = new Storage();
@@ -71,8 +78,39 @@ public class CountingBot {
                 bonus(message);
             } else if (content.startsWith(commandIndicator + "base")) {
                 baseInfo(message);
+            } else if (content.startsWith(commandIndicator + "tradeoffer")) {
+                tradeOffer(message);
             }
         }
+    }
+    
+    private void tradeOffer(Message message) {
+        String content = message.getContent().toUpperCase();
+        Counter author = this.getCounter(this.generateKeyFromUser(message.getAuthor().get()));
+        SyntaxChecker.SyntaxState syntaxState = SyntaxChecker.isValidTradeOffer(content);
+        if(syntaxState == SyntaxChecker.SyntaxState.VALID) {
+            TradeOffer tradeOffer = new TradeOffer(content, author);
+            
+            Counter requested = this.getCounter(tradeOffer.getRequestedUserId());
+            if(!tradeOffer.isTradeOfferValid(message, author, requested)) {
+                return;
+            }
+            String tradeId = getNextTradeId();
+            Button acceptButton = Button.success(tradeId, "Accept");
+            Button declineButton = Button.danger("-" + tradeId, "Decline");
+            String cont = tradeOffer.getUserPing() + " do you accept the trade offer?";
+            MessageCreateSpec spec = MessageCreateSpec.builder().addComponent(ActionRow.of(List.of(declineButton,acceptButton))).build().withContent(cont);
+            message.getChannel().block().createMessage(spec).subscribe();
+            
+            requested.addTradeOffer(tradeOffer,tradeId);
+            
+        } else {
+            switch(syntaxState) {
+                default:
+                    CountingBot.write(message, "you are gay");
+            }
+        }
+        
     }
     
     private void baseInfo(Message message) {
@@ -102,7 +140,24 @@ public class CountingBot {
     }
     
     private void bonusInfo(Message message) {
-        CountingBot.write(message, "Earn money by getting your daily bonus.\nUsage: '~bonus [type] [count]'\nTypes: daily");
+        String answ = "Earn money by getting your daily bonus.\nUsage: '~bonus [type] [count]'\n\nYour streaks so far:";
+        
+        Counter author = this.getCounter(this.generateKeyFromUser(message.getAuthor().get()));
+        for(BonusStreak curr: author.getBonusStreaks()) {
+            int currCount = curr.getCurrCount();
+            answ += "\n" + curr.getType().name() + ": ";
+            if(currCount == -1) {
+                answ += "start your streak with 0!";
+            } else {
+                if(curr.isTimeLegit()) {
+                    answ += currCount;
+                } else {
+                    answ += currCount + " (on cooldown!)";
+                }
+            }
+            
+        }
+        CountingBot.write(message, answ);
     }
     
     private void balance(Message message) {
@@ -322,6 +377,11 @@ public class CountingBot {
 
     public static CountingBot getInstance() {
         return instance;
+    }
+    
+    public static synchronized String getNextTradeId() {
+        currId += 1;
+        return String.valueOf(currId);
     }
 
 }

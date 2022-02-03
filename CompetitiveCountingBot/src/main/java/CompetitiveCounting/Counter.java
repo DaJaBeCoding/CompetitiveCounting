@@ -5,6 +5,7 @@
  */
 package CompetitiveCounting;
 import discord4j.core.object.entity.Message;
+import java.util.HashMap;
 
 /**
  *
@@ -20,6 +21,7 @@ public class Counter {
     private int[] unlocked;
     private int[] unlockedSystems;
     private BonusStreak[] bonusStreaks;
+    private transient HashMap<String, TradeOffer> tradeOffers = new HashMap<String, TradeOffer>();
 
     public Counter(String key, String name, int score, int prestiges, int prestigePoints, int[] unlocked, int[] unlockedSystems, BonusStreak[] bonusStreaks) {
         this.key = key;
@@ -93,6 +95,47 @@ public class Counter {
         }
         return worth;
     }
+    
+    public void addTradeOffer(TradeOffer tradeOffer, String key) { //trading start
+        if(tradeOffers == null) {
+            tradeOffers = new HashMap<>();
+        }
+        tradeOffers.put(key, tradeOffer);
+    }
+    
+    public String buttonClick(String customId) {
+        if(tradeOffers == null) {
+            tradeOffers = new HashMap<>();
+        }
+        if(customId.startsWith("-")) {  // DECLINE
+            System.out.println("Tradeoffer declined!");
+            String newId = customId.substring(1);
+            if(tradeOffers.containsKey(newId)) {
+                tradeOffers.remove(newId);
+                return "Offer declined!";
+            } else{
+                return "This offer doesn't match any of yours";
+            }
+        } else if(tradeOffers.containsKey(customId)) {
+            TradeOffer offer = tradeOffers.get(customId);
+            String answ = offer.isTradeOfferValid();
+            if(answ.toUpperCase().equals("VALID")) {
+                offer.fullfill();
+                tradeOffers.remove(customId);
+                return "Accepted!";
+            } else {
+                return answ;
+            }
+        } else{
+            return "This offer doesn't match any of yours";
+        }
+    }       
+
+
+    public void transferTo(Counter to, int amount) {
+        to.addBonusScore(amount);
+        subtractScore(amount);
+    }//trading end
 
     public boolean prestige(Message message) {
         if (getAccWorth() >= PRESTIGE_WORTH) {
@@ -110,6 +153,10 @@ public class Counter {
 
     public int getPrestiges() {
         return prestiges;
+    }
+    
+    public BonusStreak[] getBonusStreaks() {
+        return bonusStreaks;
     }
 
     private void addUnlocked(Message message, Unlockable unlockable) {
@@ -273,4 +320,14 @@ public class Counter {
     public int getPrestigePoints() {
         return prestigePoints;
     }
+    
+    public String getPing() {
+        return "<@!" + getId() + ">";
+    }
+
+    
+
+    
+
+    
 }
