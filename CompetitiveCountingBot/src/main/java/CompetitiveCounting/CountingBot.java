@@ -79,7 +79,7 @@ public class CountingBot {
             } else if (content.startsWith(commandIndicator + "base")) {
                 baseInfo(message);
             } else if (content.startsWith(commandIndicator + "tradeoffer")) {
-                tradeOffer(message);
+                //tradeOffer(message);
             }
         }
     }
@@ -90,9 +90,12 @@ public class CountingBot {
         SyntaxChecker.SyntaxState syntaxState = SyntaxChecker.isValidTradeOffer(content);
         if(syntaxState == SyntaxChecker.SyntaxState.VALID) {
             TradeOffer tradeOffer = new TradeOffer(content, author);
-            
+            if(tradeOffer.getRequestedUser() == null) {
+                CountingBot.write(message, "This user doesn't seem to have ever counted!");
+                return;
+            }
             Counter requested = this.getCounter(tradeOffer.getRequestedUserId());
-            if(!tradeOffer.isTradeOfferValid(message, author, requested)) {
+            if(!tradeOffer.isTradeOfferValid(message)) {
                 return;
             }
             String tradeId = getNextTradeId();

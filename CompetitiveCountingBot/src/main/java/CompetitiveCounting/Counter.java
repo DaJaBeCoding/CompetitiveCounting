@@ -135,6 +135,8 @@ public class Counter {
     public void transferTo(Counter to, int amount) {
         to.addBonusScore(amount);
         subtractScore(amount);
+        CountingBot.getInstance().safeCounters();
+        
     }//trading end
 
     public boolean prestige(Message message) {

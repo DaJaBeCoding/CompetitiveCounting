@@ -35,12 +35,17 @@ public class TradeOffer {
         userPing = splitted[1].replaceAll(" ", "");
         userId = userPing.substring(3,userPing.length()-1);
         requCounter = CountingBot.getInstance().getCounter(userId);
+     
         try {
-        youGetTrades = Tradable.generateTradables(youGet);
+            youGetTrades = Tradable.generateTradables(youGet);
             iGetTrades = Tradable.generateTradables(iGet);
         } catch(Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    public Counter getRequestedUser() {
+        return requCounter;
     }
     
     public void fullfill() {
@@ -67,13 +72,13 @@ public class TradeOffer {
         return userPing;
     }
     
-    public boolean isTradeOfferValid(Message message, Counter initiator, Counter requested) {
+    public boolean isTradeOfferValid(Message message) {
         //check money
-        if(getTotalMoneyRequirement(iGetTrades) > requested.getScore()) {
+        if(getTotalMoneyRequirement(iGetTrades) > requCounter.getScore()) {
             CountingBot.write(message, userPing + " doesn't have enough money in their bank!");
             return false;
         }
-        if(getTotalMoneyRequirement(youGetTrades) > initiator.getScore()) {
+        if(getTotalMoneyRequirement(youGetTrades) > initCounter.getScore()) {
             CountingBot.write(message, "You don't have enough money in your bank!");
             return false;
         }
