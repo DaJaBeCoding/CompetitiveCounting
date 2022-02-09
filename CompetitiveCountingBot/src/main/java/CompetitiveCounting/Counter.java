@@ -4,8 +4,13 @@
  * and open the template in the editor.
  */
 package CompetitiveCounting;
+
 import discord4j.core.object.entity.Message;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  *
@@ -21,7 +26,10 @@ public class Counter {
     private int[] unlocked;
     private int[] unlockedSystems;
     private BonusStreak[] bonusStreaks;
+    private List<Contract> contracts;
+    private transient List<Contract> incomingContracts;
     private transient HashMap<String, TradeOffer> tradeOffers = new HashMap<String, TradeOffer>();
+    private transient ContractHandler contractHandler;
 
     public Counter(String key, String name, int score, int prestiges, int prestigePoints, int[] unlocked, int[] unlockedSystems, BonusStreak[] bonusStreaks) {
         this.key = key;
@@ -33,6 +41,35 @@ public class Counter {
         this.prestigePoints = prestigePoints;
         this.unlockedSystems = unlockedSystems;
         this.bonusStreaks = bonusStreaks;
+        init();
+        initIncomingContracts(CountingBot.getInstance().getCounters());
+    }
+
+    public void init() {
+        if (contractHandler == null) {
+            contractHandler = new ContractHandler(this);
+        }
+        if (contracts == null) {
+            contracts = new ArrayList<>();
+        }
+        if (incomingContracts == null) {
+            incomingContracts = new ArrayList<>();
+        }
+        
+
+    }
+    
+    public void initIncomingContracts(HashMap<String, Counter> counters) {
+        if (incomingContracts.isEmpty()) {
+            counters.forEach((String currId, Counter counter) -> {
+                for (Contract currContract : counter.getContracts()) {
+                    if (currContract.toId.equals(this.getId())) {
+                        currContract.owner = counter;
+                        incomingContracts.add(currContract);
+                    }
+                }
+            });
+        }
     }
 
     public void unlock(Unlockable unlockable, Message message) {
@@ -46,7 +83,7 @@ public class Counter {
                 return;
             }
             this.addUnlocked(message, unlockable);
-           
+
         } else {
             if (this.isUnlocked(unlockable)) {
                 CountingBot.write(message, "You have already unlocked this.");
@@ -73,7 +110,7 @@ public class Counter {
             currBase = unlockedSystems[x];
             x++;
         }
-        double fact =(1.0 + 0.25 * x);
+        double fact = (1.0 + 0.25 * x);
         return fact;
     }
 
@@ -95,48 +132,47 @@ public class Counter {
         }
         return worth;
     }
-    
+
     public void addTradeOffer(TradeOffer tradeOffer, String key) { //trading start
-        if(tradeOffers == null) {
+        if (tradeOffers == null) {
             tradeOffers = new HashMap<>();
         }
         tradeOffers.put(key, tradeOffer);
     }
-    
+
     public String buttonClick(String customId) {
-        if(tradeOffers == null) {
+        if (tradeOffers == null) {
             tradeOffers = new HashMap<>();
         }
-        if(customId.startsWith("-")) {  // DECLINE
+        if (customId.startsWith("-")) {  // DECLINE
             System.out.println("Tradeoffer declined!");
             String newId = customId.substring(1);
-            if(tradeOffers.containsKey(newId)) {
+            if (tradeOffers.containsKey(newId)) {
                 tradeOffers.remove(newId);
                 return "Offer declined!";
-            } else{
+            } else {
                 return "This offer doesn't match any of yours";
             }
-        } else if(tradeOffers.containsKey(customId)) {
+        } else if (tradeOffers.containsKey(customId)) {
             TradeOffer offer = tradeOffers.get(customId);
             String answ = offer.isTradeOfferValid();
-            if(answ.toUpperCase().equals("VALID")) {
+            if (answ.toUpperCase().equals("VALID")) {
                 offer.fullfill();
                 tradeOffers.remove(customId);
                 return "Accepted!";
             } else {
                 return answ;
             }
-        } else{
+        } else {
             return "This offer doesn't match any of yours";
         }
-    }       
-
+    }
 
     public void transferTo(Counter to, int amount) {
         to.addBonusScore(amount);
         subtractScore(amount);
         CountingBot.getInstance().safeCounters();
-        
+
     }//trading end
 
     public boolean prestige(Message message) {
@@ -156,7 +192,7 @@ public class Counter {
     public int getPrestiges() {
         return prestiges;
     }
-    
+
     public BonusStreak[] getBonusStreaks() {
         return bonusStreaks;
     }
@@ -184,8 +220,7 @@ public class Counter {
                     unlockBase(message, "3");
                     break;
             }
-        } 
-       
+        }
 
     }
 
@@ -245,8 +280,48 @@ public class Counter {
         return streak;
     }
 
+    public void contractInfo(Message message) {
+        String mess = "";
+        if (contracts.size() == 0 && incomingContracts.size() == 0) {
+            CountingBot.write(message, "You don't have any active contracts!");
+            return;
+        }
+        if (contracts.size() == 1) {
+            mess += "You pay to\n" + CountingBot.getInstance().getCounter(contracts.get(0).toId).getName() + ": " + contracts.get(0).toString();
+        } else if (contracts.size() > 1) {
+            mess += "You pay " + contractHandler.getCurrentTotalPerc() + " of your income to";
+            for (Contract curr : contracts) {
+                mess += "\n" + CountingBot.getInstance().getCounter(contracts.get(0).toId).getName() + ": " + curr.toString();
+            }
+        }
+        if (incomingContracts.size() > 0) {
+            mess += "\n\nYou get from";
+            for (Contract curr : incomingContracts) {
+                mess += "\n" + curr.owner.getName() + ": " + curr.toString();
+            }
+        }
+        CountingBot.write(message, mess);
+    }
+
+    public void cancelContractsTo(Counter to) {
+        Iterator<Contract> it = contracts.iterator();
+        while (it.hasNext()) {
+            Contract next = it.next();
+            if (to.getId().equals(next.toId)) {
+                it.remove();
+            }
+        }
+        it = to.getIncomingContracts().iterator();
+        while (it.hasNext()) {
+            Contract next = it.next();
+            if (getId().equals(next.toId)) {
+                it.remove();
+            }
+        }
+    }
+
     public void notifyCount(int number, int base) {
-        currScoreAdd += Math.round(number  * getFactFromSys(base));
+        currScoreAdd += Math.round(number * getFactFromSys(base));
     }
 
     public void notifyWin(int win, int base) {
@@ -254,7 +329,7 @@ public class Counter {
     }
 
     public void succeed(int base) {
-        score += (int) (currScoreAdd);
+        addBonusScore(currScoreAdd);
         currScoreAdd = 0;
     }
 
@@ -285,7 +360,16 @@ public class Counter {
     }
 
     public void addBonusScore(int score) {
-        this.score += score;
+        this.score += contractHandler.getNetto(score);
+    }
+
+    public void addBonusScoreFromContract(int score) {
+        int taxed = (int) (score / 2);
+        if (taxed != 0) {
+            addBonusScore(taxed);
+        }
+        this.score += score - taxed;
+
     }
 
     public int getScore() {
@@ -322,14 +406,20 @@ public class Counter {
     public int getPrestigePoints() {
         return prestigePoints;
     }
-    
+
     public String getPing() {
         return "<@!" + getId() + ">";
     }
 
-    
+    public ContractHandler getContractHandler() {
+        return contractHandler;
+    }
 
-    
+    public List<Contract> getContracts() {
+        return contracts;
+    }
 
-    
+    public List<Contract> getIncomingContracts() {
+        return incomingContracts;
+    }
 }

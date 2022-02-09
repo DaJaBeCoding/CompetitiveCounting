@@ -37,8 +37,8 @@ public class TradeOffer {
         requCounter = CountingBot.getInstance().getCounter(userId);
      
         try {
-            youGetTrades = Tradable.generateTradables(youGet);
-            iGetTrades = Tradable.generateTradables(iGet);
+            youGetTrades = Tradable.generateTradables(youGet, initCounter, requCounter);
+            iGetTrades = Tradable.generateTradables(iGet, requCounter, initCounter);
         } catch(Exception e) {
             e.printStackTrace();
         }
@@ -62,6 +62,13 @@ public class TradeOffer {
             from.transferTo(to,((MoneyTrade)tradable).getAmount());
             return;
         }
+        if(tradable instanceof Tradable.ContractTrade) {
+            Tradable.ContractTrade trade = (Tradable.ContractTrade) tradable;
+            from.getContractHandler().addContract(to, trade.getPercentage(), trade.getLimit());
+        }
+        if(tradable instanceof Tradable.ContractNullTrade) {
+            to.cancelContractsTo(from);
+        }
     }
     
     public String getRequestedUserId() {
@@ -82,6 +89,16 @@ public class TradeOffer {
             CountingBot.write(message, "You don't have enough money in your bank!");
             return false;
         }
+        
+        // check contract < 100%
+        if(getTotalContractPerc(iGetTrades) + requCounter.getContractHandler().getCurrentTotalPerc() > 1) {
+            CountingBot.write(message, initCounter.getName() + " can't give away more than 100% of their earnings!");
+            return false;
+        }
+        if(getTotalContractPerc(youGetTrades) + initCounter.getContractHandler().getCurrentTotalPerc() > 1) {
+            CountingBot.write(message, "You can't give away more than 100% of your earnings!");
+            return false;
+        }
         return true;
     }
     
@@ -93,6 +110,16 @@ public class TradeOffer {
         if(getTotalMoneyRequirement(youGetTrades) > initCounter.getScore()) {
             return initCounter.getPing() + " doesn't have enough money in their bank!";
         }
+        
+        //check contracts < 100%
+        if(getTotalContractPerc(iGetTrades) + requCounter.getContractHandler().getCurrentTotalPerc() > 1) {
+            return initCounter.getName() + " can't give away more than 100% of their earnings!";
+        }
+        if(getTotalContractPerc(youGetTrades) + initCounter.getContractHandler().getCurrentTotalPerc() > 1) {
+            return "You can't give away more than 100% of your earnings!";
+        }
+        
+        
         return "VALID";
     }
     
@@ -104,5 +131,15 @@ public class TradeOffer {
             }
         }
         return money;
+    }
+    
+    private float getTotalContractPerc(Tradable[] tradables) {
+        float tot = 0;
+        for(Tradable trad: tradables) {
+            if(trad instanceof Tradable.ContractTrade) {
+                tot += ((Tradable.ContractTrade)trad).getPercentage();
+            }
+        }
+        return tot;
     }
 }

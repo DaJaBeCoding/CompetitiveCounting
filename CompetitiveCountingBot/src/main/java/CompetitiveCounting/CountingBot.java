@@ -4,11 +4,15 @@
  * and open the template in the editor.
  */
 package CompetitiveCounting;
+import discord4j.common.util.Snowflake;
+import discord4j.core.DiscordClient;
+import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.component.ActionRow;
 import discord4j.core.object.component.Button;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 import discord4j.core.spec.MessageCreateSpec;
+import discord4j.discordjson.json.ChannelData;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -29,9 +33,10 @@ public class CountingBot {
     private static CountingBot instance;
     
     private static int currId = 0;
-
-    public CountingBot() {
+    private static GatewayDiscordClient client;
+    public CountingBot(GatewayDiscordClient client) {
         storage = new Storage();
+        this.client = client;
         counters = storage.loadCounters();
         System.out.println(counters);
         streaks = new HashMap<>();
@@ -49,10 +54,11 @@ public class CountingBot {
 
     private void checkCommands(Message message) {
         String content = message.getContent();
+        try {
         if (content.startsWith(commandIndicator)) {
             addCounterOptionally(message.getAuthor().get());
             if (content.startsWith(commandIndicator + "help")) {
-                message.getChannel().block().createMessage("So you need help? Here you go. \n http://hyperlexus.net/competitivecountinghelp.html").subscribe();
+                message.getChannel().block().createMessage("tasukete kudasai!\nhttp://hyperlexus.net/competitivecountinghelp.html").subscribe();
             } else if (content.startsWith(commandIndicator + "scoreboard") || content.equals(commandIndicator + "top")) {
                 message.getChannel().block().createMessage(scoreboard()).subscribe();
             } else if (content.startsWith(commandIndicator + "score")) {
@@ -80,8 +86,20 @@ public class CountingBot {
                 baseInfo(message);
             } else if (content.startsWith(commandIndicator + "tradeoffer")) {
                 //tradeOffer(message);
+            } else if (content.startsWith(commandIndicator + "contracts")) {
+                contractInfo(message);
             }
         }
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
+    
+    
+    private void contractInfo(Message message) {
+        Counter author = this.getCounter(this.generateKeyFromUser(message.getAuthor().get()));
+        author.contractInfo(message);
     }
     
     private void tradeOffer(Message message) {
@@ -152,10 +170,18 @@ public class CountingBot {
             if(currCount == -1) {
                 answ += "start your streak with 0!";
             } else {
-                if(curr.isTimeLegit()) {
-                    answ += currCount;
-                } else {
-                    answ += currCount + " (on cooldown!)";
+                switch ((int)curr.getDaysSinceCount()) {
+                    case 0:
+                        answ += "currently at " + currCount + " (wait " + TimeHandler.timeUntilTomorrowString() + ")";
+                        break;
+                    case 1:
+                        answ += "currently at " + currCount + " and ready for the next number!";
+                        break;
+                    case 2:
+                        answ += "currently at " + currCount + " (expired yesterday; start over again)";
+                        break;
+                    default: 
+                        answ += "currently at " + currCount + " (expired " + (curr.getDaysSinceCount()-1) + " days ago; start over again)";
                 }
             }
             
@@ -353,6 +379,12 @@ public class CountingBot {
     public static void write(Message message, String s) {
         message.getChannel().block().createMessage(s).subscribe();
     }
+    
+    public static void sendDMTo(Counter counter) {
+        //client.getUserById(Snowflake.of(counter.getId())).getPrivateChannel().doOnNext((ChannelData channalData)->{
+        //    ((ChannelData)channelData).
+        //});
+    }
 
     private int getScore(User user) {
         int score = counters.get(generateKeyFromUser(user)).getPossibleTotal();
@@ -376,6 +408,10 @@ public class CountingBot {
 
     public Counter getCounter(String id) {
         return counters.get(id);
+    }
+    
+    public HashMap<String, Counter> getCounters() {
+        return counters;
     }
 
     public static CountingBot getInstance() {

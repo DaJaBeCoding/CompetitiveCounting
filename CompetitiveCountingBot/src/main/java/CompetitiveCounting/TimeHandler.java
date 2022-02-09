@@ -6,7 +6,9 @@
 package CompetitiveCounting;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 
 /**
  *
@@ -15,17 +17,30 @@ import java.time.temporal.ChronoUnit;
 public class TimeHandler {
     
     public static boolean isYesterday(long epochDay) {
-        LocalDate now = LocalDate.now();
-        LocalDate test = LocalDate.ofEpochDay(epochDay);
-        if(test.plusDays(1).equals(now)) {
+        if(getDaysBetween(epochDay) == 1) {
             return true;
         } else {
             return false;
         }
     }
     
+    public static long getDaysBetween(long epochDay) {
+        return LocalDate.now().minusDays(epochDay).toEpochDay();
+    }
+    
     public static long nowInEpochDay() {
         return LocalDate.now().toEpochDay();
+    }
+    
+    public static long minutesUntilTomorrow() {
+        return LocalTime.now().until(LocalTime.MAX, ChronoUnit.MINUTES);
+    }
+    
+    public static String timeUntilTomorrowString() {
+        long untilTom = minutesUntilTomorrow();
+        String hours = String.valueOf((int)(untilTom/60.0d));
+        String minutes = String.valueOf(untilTom % 60);
+        return hours + "h" + minutes + "min";
     }
     
 }

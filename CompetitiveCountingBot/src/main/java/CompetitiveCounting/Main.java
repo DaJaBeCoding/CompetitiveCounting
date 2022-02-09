@@ -27,6 +27,7 @@ public class Main {
     private static CountingBot bot;
 
     public static void main(String[] args) {
+        System.out.println(TimeHandler.nowInEpochDay());
         GatewayDiscordClient client;
         try {
             
@@ -49,11 +50,12 @@ public class Main {
                     ));
                 });
         
-        bot = new CountingBot();
+        bot = new CountingBot(client);
         MessageHandler messageHandler = new MessageHandler(bot);
         client.getEventDispatcher().on(MessageCreateEvent.class).subscribe(messageHandler);
         ButtonClickHandler buttonHandler = new ButtonClickHandler(bot);
         client.getEventDispatcher().on(ButtonInteractionEvent.class).subscribe(buttonHandler);
+        
         // database
         /*
         DatabaseConnection databaseConnection = new DatabaseConnection();

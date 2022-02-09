@@ -27,6 +27,9 @@ public class Util {
         } else {
             String snd = "";
             for(int i = 1; i < splitted.length; i++) {
+                if(i > 1) {
+                    snd += splitter;
+                }
                 snd += splitted[i];
             }
             return new String[]{splitted[0], snd};

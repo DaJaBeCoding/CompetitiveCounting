@@ -24,6 +24,12 @@ public class BonusStreak {
     }
 
     public void count(Counter counter, Message message, int count) {
+        if(count == 0) {
+            currentCount = 0;
+            lastCountTime = this.getTimeNow();
+            CountingBot.write(message, "You started a new " + type.name() + " streak. Come back tomorrow for your first reward!");
+            return;
+        }
         if (isTimeLegit() && count == currentCount + 1) {
             currentCount++;
             lastCountTime = this.getTimeNow();
@@ -32,29 +38,22 @@ public class BonusStreak {
         } else {
             if(currentCount == -1) {
                 CountingBot.write(message, "Begin your streak with 0!");
-            } else if(!isTimeLegit()) {
-                fail(message, "time");
             } else {
-                fail(message, "num");
+                if(currentCount + 1 != count) {
+                    CountingBot.write(message, "Whoops! You messed up your " + type.name() + " streak at " + currentCount + " , because apparently you have no idea what comes after " + this.currentCount + ".");
+                } else if(getDaysSinceCount() > 1) {
+                    CountingBot.write(message, "Whoops! You messed up your " + type.name() + " streak at " + currentCount + " , because you waited too long.");
+                } else {
+                    CountingBot.write(message, "Whoops! Your " + type.name() + " streak is still on cooldown! You messed it up at " + currentCount + ".");
+                }
+                this.currentCount = -1;
+                this.lastCountTime = -1;
             }
         }
     }
     
     private void success(Message message, int count) {
         CountingBot.write(message, "Bonus received: You get " + (count*type.multiplier) + " money from your " + type.name() + " streak.");
-    }
-    
-    private void fail(Message message, String arg) {
-        switch(arg) {
-            case "time":
-                CountingBot.write(message, "Whoops! You messed up your " + type.name() + " streak at " + currentCount + " , because apparently you have no idea what " + type.name() + " means.");
-                break;
-            case "num":
-                CountingBot.write(message, "Whoops! You messed up your " + type.name() + " streak at " + currentCount + " , because apparently you have no idea what comes after " + this.currentCount + ".");
-                break;
-        }
-        this.currentCount = -1;
-        this.lastCountTime = -1;
     }
     
     public BonusCountType getType() {
@@ -89,6 +88,13 @@ public class BonusStreak {
                 }
         }
         return false;
+    }
+    
+    public long getDaysSinceCount() {
+        if (this.lastCountTime == -1) {
+            return -1;
+        }
+        return TimeHandler.getDaysBetween(lastCountTime);
     }
 
     public static enum BonusCountType {

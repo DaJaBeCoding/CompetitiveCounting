@@ -34,8 +34,14 @@ CompetitiveCounting/Rules/DigSumRule.java
 CompetitiveCounting/Storage.java
  CompetitiveCounting.Storage
  CompetitiveCounting.Storage$1
+CompetitiveCounting/ContractHandler.java
+ CompetitiveCounting.ContractHandler
+CompetitiveCounting/Contract.java
+ CompetitiveCounting.Contract
 CompetitiveCounting/Tradable.java
  CompetitiveCounting.Tradable
+ CompetitiveCounting.Tradable$ContractNullTrade
+ CompetitiveCounting.Tradable$ContractTrade
  CompetitiveCounting.Tradable$MoneyTrade
 CompetitiveCounting/Rules/TimeLimitRule.java
  CompetitiveCounting.Rules.TimeLimitRule

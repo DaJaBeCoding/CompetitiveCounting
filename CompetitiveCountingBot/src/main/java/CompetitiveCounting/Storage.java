@@ -29,6 +29,7 @@ public class Storage {
     private final static String COUNTERS_PATH = "./src/data/counters.txt";
     public final static String CONFIG_PATH = "./src/data/config.txt";
 
+    private HashMap<String,Counter> counters;
 
     public static String loadConfig() throws Exception {
         FileInputStream countersIn = new FileInputStream(CONFIG_PATH);
@@ -51,11 +52,17 @@ public class Storage {
     public HashMap<String, Counter> loadCounters() {
         String asString = loadJson();
         Gson gson = new Gson();
-        HashMap<String,Counter> ret = gson.fromJson(asString, (new TypeToken<HashMap<String,Counter>>(){}).getType());
-        if(ret == null) {
-            ret = new HashMap<String,Counter>();
+        counters = gson.fromJson(asString, (new TypeToken<HashMap<String,Counter>>(){}).getType());
+        if(counters == null) {
+            counters = new HashMap<String,Counter>();
         }
-        return ret;
+        counters.forEach((String key, Counter counter)->{
+            counter.init();
+        });
+        counters.forEach((String key, Counter counter)->{
+            counter.initIncomingContracts(counters);
+        });
+        return counters;
     }
     
     public void safeCounters(HashMap<String, Counter> counters) {
